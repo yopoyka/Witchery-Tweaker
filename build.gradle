@@ -1,0 +1,114 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+    }
+}
+
+apply plugin: 'forge'
+
+version = "1.7.10-0.24.1"
+group= "com.emoniph.witchery"
+archivesBaseName = "witchery"
+sourceCompatibility = targetCompatibility = 1.8
+
+String minetweakerVersion = '3.0.11.23'
+
+minecraft {
+    version = "1.7.10-10.13.4.1614-1.7.10"
+    runDir = "eclipse"
+    mappings = 'stable_12'
+}
+
+repositories {
+    flatDir {
+        dirs 'lib'
+    }
+    maven {
+        name 'blameJared'
+        url 'https://maven.blamejared.com/'
+    }
+}
+
+dependencies {
+    apiCompile 'MineTweaker3:MineTweaker3-API:' + minetweakerVersion
+    // compile 'MineTweaker3:MineTweaker3-MC1710-Main:1.7.10-' + minetweakerVersion
+    compile name: archivesBaseName + '-' + version + '-dev'
+}
+
+processResources
+{
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+                
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+        
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+task buildClient {
+    doFirst {
+        jar {
+            exclude 'muwa/witcherytweaker/coremod'
+            version += '-client'
+        }
+    }
+
+    finalizedBy build
+}
+
+task buildServer {
+    doFirst {
+        jar {
+            manifest {
+                attributes 'FMLCorePlugin': 'muwa.witcherytweaker.coremod.CorePlugin'
+                attributes 'FMLCorePluginContainsFMLMod': 'true'
+            }
+            version += '-server'
+        }
+    }
+    finalizedBy build
+}
+
+runClient {
+    args += ['--username', 'Dev']
+}
+
+task exeClient {
+    doFirst {
+        jar {
+            exclude 'muwa/witcherytweaker/coremod'
+            version += '-client'
+        }
+    }
+    finalizedBy runClient
+}
+
+task exeServer {
+    doFirst {
+        jar {
+            manifest {
+                attributes 'FMLCorePlugin': 'muwa.witcherytweaker.coremod.CorePlugin'
+                attributes 'FMLCorePluginContainsFMLMod': 'true'
+            }
+            version += '-server'
+        }
+    }
+    finalizedBy runServer
+}
