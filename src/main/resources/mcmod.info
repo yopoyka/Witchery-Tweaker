@@ -1,0 +1,16 @@
+[
+{
+  "modid": "witweaker",
+  "name": "Witchery Tweaker",
+  "description": "",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Workbench61"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

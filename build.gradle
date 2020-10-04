@@ -17,9 +17,9 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "1.7.10-0.24.1"
-group= "com.emoniph.witchery"
-archivesBaseName = "witchery"
+version = "1.0"
+group= "muwa"
+archivesBaseName = "witcherytweaker"
 sourceCompatibility = targetCompatibility = 1.8
 
 String minetweakerVersion = '3.0.11.23'
@@ -41,9 +41,9 @@ repositories {
 }
 
 dependencies {
-    apiCompile 'MineTweaker3:MineTweaker3-API:' + minetweakerVersion
+    compileOnly 'MineTweaker3:MineTweaker3-API:' + minetweakerVersion
+    compile name: 'witchery-1.7.10-0.24.1-dev'
     // compile 'MineTweaker3:MineTweaker3-MC1710-Main:1.7.10-' + minetweakerVersion
-    compile name: archivesBaseName + '-' + version + '-dev'
 }
 
 processResources
@@ -88,27 +88,9 @@ task buildServer {
 
 runClient {
     args += ['--username', 'Dev']
+    systemProperty 'fml.coreMods.load', 'muwa.witcherytweaker.coremod.CorePlugin'
 }
 
-task exeClient {
-    doFirst {
-        jar {
-            exclude 'muwa/witcherytweaker/coremod'
-            version += '-client'
-        }
-    }
-    finalizedBy runClient
-}
-
-task exeServer {
-    doFirst {
-        jar {
-            manifest {
-                attributes 'FMLCorePlugin': 'muwa.witcherytweaker.coremod.CorePlugin'
-                attributes 'FMLCorePluginContainsFMLMod': 'true'
-            }
-            version += '-server'
-        }
-    }
-    finalizedBy runServer
+runServer {
+    systemProperty 'fml.coreMods.load', 'muwa.witcherytweaker.coremod.CorePlugin'
 }
