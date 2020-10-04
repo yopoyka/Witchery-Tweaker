@@ -25,9 +25,10 @@ sourceCompatibility = targetCompatibility = 1.8
 String minetweakerVersion = '3.0.11.23'
 
 minecraft {
-    version = "1.7.10-10.13.4.1614-1.7.10"
+    // version = "1.7.10-10.13.4.1614-1.7.10"
+    version = "1.7.10-10.13.4.1448-1.7.10"
     runDir = "eclipse"
-    mappings = 'stable_12'
+    // mappings = 'stable_12'
 }
 
 repositories {
@@ -38,12 +39,26 @@ repositories {
         name 'blameJared'
         url 'https://maven.blamejared.com/'
     }
+    maven {
+        name 'chickenBones'
+        url 'https://chickenbones.net/maven'
+    }
 }
 
 dependencies {
     compileOnly 'MineTweaker3:MineTweaker3-API:' + minetweakerVersion
     compile name: 'witchery-1.7.10-0.24.1-dev'
-    // compile 'MineTweaker3:MineTweaker3-MC1710-Main:1.7.10-' + minetweakerVersion
+    runtime name: 'MineTweaker3-1.7.10-3.0.10B-dev'
+    // compile name: 'CodeChickenCore-1.7.10-1.0.7.47-universal-dev'
+    // compile name: 'NotEnoughItems-1.7.10-2.0.1-dev'
+    // compile name: 'CodeChickenLib-1.7.10-1.1.3.138-universal-dev'
+    compile "codechicken:CodeChickenLib:1.7.10-1.1.3.140:dev"
+    compileOnly "codechicken:CodeChickenLib:1.7.10-1.1.3.140:src"
+    compile "codechicken:CodeChickenCore:1.7.10-1.0.7.47:dev"
+    compileOnly "codechicken:CodeChickenCore:1.7.10-1.0.7.47:src"
+    compile "codechicken:NotEnoughItems:1.7.10-1.0.5.120:dev"
+    compileOnly "codechicken:NotEnoughItems:1.7.10-1.0.5.120:src"
+    implementation 'MineTweaker3:MineTweaker3-MC1710-Main:1.7.10-' + minetweakerVersion
 }
 
 processResources

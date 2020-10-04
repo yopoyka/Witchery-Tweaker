@@ -27,7 +27,7 @@ public class ServerCoreMod {
                         inst.add(new VarInsnNode(Opcodes.ALOAD, 0));
                         inst.add(new MethodInsnNode(
                                 Opcodes.INVOKESTATIC,
-                                "muwa/witcherytweaker/WitchOvenHook",
+                                "muwa/witcherytweaker/server/WitchOvenHook",
                                 "updateOven",
                                 "(Lcom/emoniph/witchery/blocks/BlockWitchesOven$TileEntityWitchesOven;)V",
                                 false
@@ -53,6 +53,14 @@ public class ServerCoreMod {
             mv.visitFieldInsn(Opcodes.GETFIELD, "com/emoniph/witchery/blocks/BlockWitchesOven$TileEntityWitchesOven", "wtw_cookTime", "I");
             mv.visitInsn(Opcodes.IRETURN);
             mv.visitEnd();
+
+            classNode.methods
+                    .stream()
+                    .filter(m -> m.name.equals("getFumeFunnels")
+                            || m.name.equals("generateByProduct")
+                            || m.name.equals("getFumeFunnelsChance")
+                    )
+                    .forEach(m -> m.access = Opcodes.ACC_PUBLIC);
 
             return write(classNode);
         }

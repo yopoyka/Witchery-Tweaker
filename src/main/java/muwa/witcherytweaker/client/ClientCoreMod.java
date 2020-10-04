@@ -55,7 +55,7 @@ public class ClientCoreMod {
 
                         methodNode.instructions.insertBefore(ret, inst);
 
-                        CorePlugin.log.info("Successfully patched tile Witch's Oven Container's updateProgressBar method");
+                        CorePlugin.log.info("Successfully patched Witch's Oven Container's updateProgressBar method");
                     });
 
             return write(classNode);
@@ -100,9 +100,33 @@ public class ClientCoreMod {
                                     methodNode.instructions.insertBefore(node, inst);
                                     methodNode.instructions.remove(node);
 
-                                    CorePlugin.log.info("Successfully patched tile Witch's Oven Gui's drawGuiContainerBackgroundLayer method");
+                                    CorePlugin.log.info("Successfully patched Witch's Oven Gui's drawGuiContainerBackgroundLayer method");
                                 });
                     });
+
+            return write(classNode);
+        }
+        else if (name.equals("com.emoniph.witchery.integration.NEIWitcheryConfig")) {
+            ClassNode classNode = read(basicClass);
+
+            classNode.methods
+                .stream()
+                .filter(m -> m.name.equals("loadConfig"))
+                .findFirst()
+                .ifPresent(methodNode -> {
+                    methodNode.instructions.iterator().forEachRemaining(node -> {
+                        if (node.getOpcode() == Opcodes.NEW && node instanceof TypeInsnNode) {
+                            if (((TypeInsnNode) node).desc.equals("com/emoniph/witchery/integration/NEIWitchesOvenRecipeHandler"))
+                                ((TypeInsnNode) node).desc = "muwa/witcherytweaker/common/nei/NeiWitchOvenHandler";
+                        }
+                        else if (node.getOpcode() == Opcodes.INVOKESPECIAL && node instanceof MethodInsnNode) {
+                            if (((MethodInsnNode) node).owner.equals("com/emoniph/witchery/integration/NEIWitchesOvenRecipeHandler"))
+                                ((MethodInsnNode) node).owner = "muwa/witcherytweaker/common/nei/NeiWitchOvenHandler";
+                        }
+                    });
+
+                    CorePlugin.log.info("Successfully patched NEIWitcheryConfig");
+                });
 
             return write(classNode);
         }

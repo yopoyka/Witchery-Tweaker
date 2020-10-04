@@ -1,7 +1,7 @@
-package muwa.witcherytweaker;
+package muwa.witcherytweaker.server;
 
 import com.emoniph.witchery.blocks.BlockWitchesOven;
-import muwa.witcherytweaker.server.IWitchOvenTile;
+import muwa.witcherytweaker.common.WitchOvenRecipes;
 import net.minecraft.tileentity.TileEntityFurnace;
 
 public class WitchOvenHook {
@@ -13,8 +13,8 @@ public class WitchOvenHook {
             oven.furnaceBurnTime--;
         }
 
-        if (!oven.getWorld().isRemote) {
-            WitchOvenRecipe recipe = WitchOvenRecipe.getMatch(oven);
+        if (!oven.getWorldObj().isRemote) {
+            IOvenRecipe recipe = getMatch(oven);
             if (oven.furnaceBurnTime == 0 && recipe != null) {
                 oven.currentItemBurnTime = oven.furnaceBurnTime = TileEntityFurnace.getItemBurnTime(oven.getStackInSlot(1));
 
@@ -41,13 +41,13 @@ public class WitchOvenHook {
 
             if (flag != ((oven.furnaceBurnTime > 0))) {
                 update = true;
-                BlockWitchesOven.updateWitchesOvenBlockState((oven.furnaceBurnTime > 0), oven.getWorld(), oven.xCoord, oven.yCoord, oven.zCoord);
+                BlockWitchesOven.updateWitchesOvenBlockState((oven.furnaceBurnTime > 0), oven.getWorldObj(), oven.xCoord, oven.yCoord, oven.zCoord);
             }
         }
 
 
         if (update) {
-            oven.getWorld().markBlockForUpdate(oven.xCoord, oven.yCoord, oven.zCoord);
+            oven.getWorldObj().markBlockForUpdate(oven.xCoord, oven.yCoord, oven.zCoord);
         }
     }
 
@@ -59,5 +59,15 @@ public class WitchOvenHook {
                 oven.setInventorySlotContents(1, oven.getStackInSlot(1).getItem().getContainerItem(oven.getStackInSlot(1)));
             }
         }
+    }
+
+    public static IOvenRecipe getMatch(BlockWitchesOven.TileEntityWitchesOven oven) {
+        for (WitchOvenRecipes.Impl value : WitchOvenRecipes.recipes) {
+            if (((IOvenRecipe) value).canSmelt(oven))
+                return (IOvenRecipe) value;
+        }
+        if (IOvenRecipe.DEFAULT.canSmelt(oven))
+            return IOvenRecipe.DEFAULT;
+        return null;
     }
 }
