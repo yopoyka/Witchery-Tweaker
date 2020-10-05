@@ -160,14 +160,14 @@ public class ServerCoreMod {
             return basicClass;
     };
 
-    public static ClassNode read(byte[] bytes) {
+    private static ClassNode read(byte[] bytes) {
         ClassReader cr = new ClassReader(bytes);
         ClassNode classNode = new ClassNode();
         cr.accept(classNode, 0);
         return classNode;
     }
 
-    public static byte[] write(ClassNode classNode) {
+    private static byte[] write(ClassNode classNode) {
         ClassWriter cw = new ClassWriter(COMPUTE_FRAMES | COMPUTE_MAXS);
         classNode.accept(cw);
         return cw.toByteArray();

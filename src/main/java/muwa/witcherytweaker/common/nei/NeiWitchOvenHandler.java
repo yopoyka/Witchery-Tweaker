@@ -67,7 +67,7 @@ public class NeiWitchOvenHandler extends NEIWitchesOvenRecipeHandler {
     @Override
     public void loadUsageRecipes(String inputId, Object... ingredients) {
         if (inputId.equals("fuel") && getClass() == NeiWitchOvenHandler.class) {
-            loadCraftingRecipes("witchery_cooking", new Object[0]);
+            loadCraftingRecipes("witchery_cooking");
         } else {
             super.loadUsageRecipes(inputId, ingredients);
         }

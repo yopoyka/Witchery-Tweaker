@@ -2,14 +2,11 @@ package muwa.witcherytweaker;
 
 import codechicken.nei.api.API;
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
-import cpw.mods.fml.common.asm.transformers.deobf.FMLDeobfuscatingRemapper;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import cpw.mods.fml.relauncher.Side;
 import minetweaker.MineTweakerAPI;
 import muwa.witcherytweaker.common.IProxy;
+import muwa.witcherytweaker.common.KettleRecipesSupport;
 import muwa.witcherytweaker.common.WitchOvenRecipes;
 import muwa.witcherytweaker.common.nei.NeiWitchOvenHandler;
 import org.apache.logging.log4j.Level;
@@ -31,10 +28,20 @@ public class Witweaker {
     public static SimpleNetworkWrapper net;
 
 //    public static void main(String[] args) {
-//        FileSystem fs = FileSystems.newFileSystem(new URI("jar:file:///C:/Users/muwa/work/witchery/lib/witchery-1.7.10-0.24.1-dev-copy.jar"), new HashMap<>());
-//        byte[] transform = ServerCoreMod.transformer.transform("com.emoniph.witchery.blocks.BlockWitchesOven$ContainerWitchesOven", null, Files.readAllBytes(fs.getPath("com/emoniph/witchery/blocks/BlockWitchesOven$ContainerWitchesOven.class")));
-//        transform = ClientCoreMod.transformer.transform("com.emoniph.witchery.blocks.BlockWitchesOven$ContainerWitchesOven", null, transform);
-//        Files.write(Paths.get("lib/test.class"), transform);
+////        FileSystem fs = FileSystems.newFileSystem(new URI("jar:file:///C:/Users/muwa/work/witchery/lib/witchery-1.7.10-0.24.1-dev-copy.jar"), new HashMap<>());
+////        byte[] transform = ServerCoreMod.transformer.transform("com.emoniph.witchery.blocks.BlockWitchesOven$ContainerWitchesOven", null, Files.readAllBytes(fs.getPath("com/emoniph/witchery/blocks/BlockWitchesOven$ContainerWitchesOven.class")));
+////        transform = ClientCoreMod.transformer.transform("com.emoniph.witchery.blocks.BlockWitchesOven$ContainerWitchesOven", null, transform);
+////        Files.write(Paths.get("lib/test.class"), transform);
+//        try {
+//            MethodHandle constructor = MethodHandles
+//                    .lookup()
+//                    .findConstructor(
+//                            KettleRecipes.KettleRecipe.class,
+//                            MethodType.methodType(null, ItemStack.class, int.class, int.class, float.class, int.class, int.class, boolean.class, ItemStack[].class));
+//            KettleRecipes.KettleRecipe o = (KettleRecipes.KettleRecipe) constructor.invokeExact((ItemStack) null, 1, 1, 2F, 1, 1, false, (ItemStack[]) null);
+//        } catch (Throwable e) {
+//            e.printStackTrace();
+//        }
 //    }
 
     @Mod.EventHandler
@@ -55,8 +62,9 @@ public class Witweaker {
         }
 
         MineTweakerAPI.registerClass(WitchOvenRecipes.class);
-        API.registerRecipeHandler(new NeiWitchOvenHandler());
-        API.registerUsageHandler(new NeiWitchOvenHandler());
+        MineTweakerAPI.registerClass(KettleRecipesSupport.class);
+        WitchOvenRecipes.init();
+        KettleRecipesSupport.init();
 
         clientProxy.preInit();
         serverProxy.preInit();

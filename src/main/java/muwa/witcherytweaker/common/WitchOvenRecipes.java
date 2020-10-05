@@ -18,7 +18,7 @@ public class WitchOvenRecipes {
     public static IRecipeFactory factory = Impl::new;
     public static boolean defaultEnabled = true;
 
-    static {
+    public static void init() {
         MineTweakerImplementationAPI.onReloadEvent(reloadEvent -> {
             Witweaker.log.info("Reloading Witch's Oven recipes.");
             recipes.clear();
