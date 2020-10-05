@@ -53,7 +53,6 @@ public class ClassTransformer implements IClassTransformer {
 
                     do {
                         start = start.getNext();
-                        log.info(start);
                         kettle.add(start.clone(new HashMap<LabelNode, LabelNode>() {
                             @Override
                             public LabelNode get(Object key) {

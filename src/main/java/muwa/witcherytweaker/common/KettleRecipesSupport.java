@@ -44,7 +44,7 @@ public class KettleRecipesSupport {
     public static KettleRecipeWrapper add(
             IItemStack output,
             IItemStack[] input
-    ) {
+    ) throws Exception {
         return add(output, input, 0F);
     }
 
@@ -53,11 +53,7 @@ public class KettleRecipesSupport {
             IItemStack output,
             IItemStack[] input,
             float power
-    ) {
-        if (input.length != 6 || Arrays.stream(input).anyMatch(i -> i == null || i.getInternal() == null)) {
-            MineTweakerAPI.logError("Kettle doesn't support partial recipes. You must provide 6 (six) ingredients.");
-            return null;
-        }
+    ) throws Exception {
         return add(
                 output,
                 input,
@@ -80,7 +76,10 @@ public class KettleRecipesSupport {
             int familiarType,
             int dimension,
             boolean inBook
-    ) {
+    ) throws Exception {
+        if (input.length != 6 || Arrays.stream(input).anyMatch(i -> i == null || i.getInternal() == null)) {
+            throw new Exception("Kettle doesn't support partial recipes. You must provide 6 (six) ingredients.");
+        }
         KettleRecipes.KettleRecipe recipe = KettleRecipes.instance().addRecipe(
                 (ItemStack) output.getInternal(),
                 hatBonus,
@@ -179,37 +178,37 @@ public class KettleRecipesSupport {
 
         @ZenMethod
         public KettleRecipeWrapper power(float powerValue) {
-            wrapError(() -> power.setFloat(this, powerValue));
+            wrapError(() -> power.setFloat(this.recipe, powerValue));
             return this;
         }
 
         @ZenMethod
         public KettleRecipeWrapper color(int colorValue) {
-            wrapError(() -> color.setInt(this, colorValue));
+            wrapError(() -> color.setInt(this.recipe, colorValue));
             return this;
         }
 
         @ZenMethod
         public KettleRecipeWrapper hatBonus(int hat) {
-            wrapError(() -> hatBonus.setInt(this, hat));
+            wrapError(() -> hatBonus.setInt(this.recipe, hat));
             return this;
         }
 
         @ZenMethod
         public KettleRecipeWrapper familiar(int type) {
-            wrapError(() -> familiarType.setInt(this, type));
+            wrapError(() -> familiarType.setInt(this.recipe, type));
             return this;
         }
 
         @ZenMethod
         public KettleRecipeWrapper dimension(int dim) {
-            wrapError(() -> dimension.setInt(this, dim));
+            wrapError(() -> dimension.setInt(this.recipe, dim));
             return this;
         }
 
         @ZenMethod
         public KettleRecipeWrapper inBook(boolean value) {
-            wrapError(() -> inBook.setBoolean(this, value));
+            wrapError(() -> inBook.setBoolean(this.recipe, value));
             return this;
         }
     }
