@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import static muwa.witcherytweaker.common.util.MTUtil.wrapError;
+import static muwa.witcherytweaker.common.util.ReflectUtil.makeAccessible;
 
 @ZenClass("mods.witchery.kettle")
 public class KettleRecipesSupport {
@@ -151,17 +152,6 @@ public class KettleRecipesSupport {
             makeAccessible(familiarType);
             makeAccessible(dimension);
             makeAccessible(inBook);
-        }
-
-        private static void makeAccessible(Field field) {
-            try {
-                field.setAccessible(true);
-                Field modifiers = Field.class.getDeclaredField("modifiers");
-                modifiers.setAccessible(true);
-                modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-            } catch (IllegalAccessException | NoSuchFieldException e) {
-                Witweaker.log.catching(e);
-            }
         }
 
         public final KettleRecipes.KettleRecipe recipe;

@@ -10,6 +10,7 @@ import org.objectweb.asm.tree.*;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import static muwa.witcherytweaker.coremod.CorePlugin.log;
@@ -51,14 +52,16 @@ public class ClassTransformer implements IClassTransformer {
                     AbstractInsnNode start = lastDist.getNext();
                     AbstractInsnNode finish = lastKettle;
 
+                    Map<LabelNode, LabelNode> map = new HashMap<LabelNode, LabelNode>() {
+                        @Override
+                        public LabelNode get(Object key) {
+                            return new LabelNode(((LabelNode) key).getLabel());
+                        }
+                    };
+
                     do {
                         start = start.getNext();
-                        kettle.add(start.clone(new HashMap<LabelNode, LabelNode>() {
-                            @Override
-                            public LabelNode get(Object key) {
-                                return new LabelNode(((LabelNode) key).getLabel());
-                            }
-                        }));
+                        kettle.add(start.clone(map));
                     } while (start != finish);
                     kettle.add(new InsnNode(Opcodes.RETURN));
 
@@ -69,6 +72,54 @@ public class ClassTransformer implements IClassTransformer {
 
                     log.info("Successfully added wtw_kettle method!");
                 });
+            return write(classNode);
+        }
+        else if (name.equals("com.emoniph.witchery.brewing.WitcheryBrewRegistry")) {
+            ClassNode classNode = read(basicClass);
+
+            classNode.methods
+                .stream()
+                .filter(m -> m.name.equals("<init>"))
+                .findFirst()
+                .ifPresent(methodNode -> {
+                    InsnList cauldron = new InsnList();
+                    AbstractInsnNode lastRegister = null;
+
+                    ListIterator<AbstractInsnNode> i = methodNode.instructions.iterator();
+                    while (i.hasNext()) {
+                        AbstractInsnNode next = i.next();
+
+                        if (next.getOpcode() == Opcodes.INVOKESPECIAL && next instanceof MethodInsnNode
+                                && ((MethodInsnNode) next).owner.equals("com/emoniph/witchery/brewing/WitcheryBrewRegistry")
+                                && ((MethodInsnNode) next).name.equals("register")) {
+                            lastRegister = next;
+                        }
+                        else if (next.getOpcode() == Opcodes.NEW && next instanceof TypeInsnNode
+                                && ((TypeInsnNode) next).desc.equals("com/emoniph/witchery/brewing/action/BrewActionRitualRecipe")
+                                && lastRegister != null)
+                            break;
+                    }
+
+                    Map<LabelNode, LabelNode> map = new HashMap<LabelNode, LabelNode>() {
+                        @Override
+                        public LabelNode get(Object key) {
+                            return new LabelNode(((LabelNode) key).getLabel());
+                        }
+                    };
+
+                    AbstractInsnNode next = lastRegister.getNext();
+                    while (next.getNext() != null) {
+                        cauldron.add(next.getNext().clone(map));
+                        next = next.getNext();
+                    }
+
+                    MethodNode wtw_cauldron = new MethodNode(Opcodes.ACC_PUBLIC, "wtw_cauldron", "()V", null, null);
+                    wtw_cauldron.instructions.add(cauldron);
+                    classNode.methods.add(wtw_cauldron);
+
+                    log.info("Successfully added wtw_cauldron method!");
+                });
+
             return write(classNode);
         }
         else

@@ -5,6 +5,7 @@ import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import minetweaker.MineTweakerAPI;
+import muwa.witcherytweaker.common.CauldronRecipesSupport;
 import muwa.witcherytweaker.common.IProxy;
 import muwa.witcherytweaker.common.KettleRecipesSupport;
 import muwa.witcherytweaker.common.WitchOvenRecipes;
@@ -63,8 +64,10 @@ public class Witweaker {
 
         MineTweakerAPI.registerClass(WitchOvenRecipes.class);
         MineTweakerAPI.registerClass(KettleRecipesSupport.class);
+        MineTweakerAPI.registerClass(CauldronRecipesSupport.class);
         WitchOvenRecipes.init();
         KettleRecipesSupport.init();
+        CauldronRecipesSupport.init();
 
         clientProxy.preInit();
         serverProxy.preInit();
