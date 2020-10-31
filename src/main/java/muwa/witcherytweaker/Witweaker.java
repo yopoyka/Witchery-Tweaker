@@ -5,10 +5,7 @@ import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import minetweaker.MineTweakerAPI;
-import muwa.witcherytweaker.common.CauldronRecipesSupport;
-import muwa.witcherytweaker.common.IProxy;
-import muwa.witcherytweaker.common.KettleRecipesSupport;
-import muwa.witcherytweaker.common.WitchOvenRecipes;
+import muwa.witcherytweaker.common.*;
 import muwa.witcherytweaker.common.nei.NeiWitchOvenHandler;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -17,8 +14,8 @@ import org.apache.logging.log4j.Logger;
 @Mod(
         modid = Witweaker.MOD_ID,
         name = Witweaker.MOD_NAME,
+        version = "1.0",
         dependencies = "required-after:witchery;required-after:MineTweaker3;"
-
 )
 public class Witweaker {
     public static final String MOD_ID = "witweaker";
@@ -65,9 +62,11 @@ public class Witweaker {
         MineTweakerAPI.registerClass(WitchOvenRecipes.class);
         MineTweakerAPI.registerClass(KettleRecipesSupport.class);
         MineTweakerAPI.registerClass(CauldronRecipesSupport.class);
+        MineTweakerAPI.registerClass(DistilleryRecipesSupport.class);
         WitchOvenRecipes.init();
         KettleRecipesSupport.init();
         CauldronRecipesSupport.init();
+        DistilleryRecipesSupport.init();
 
         clientProxy.preInit();
         serverProxy.preInit();

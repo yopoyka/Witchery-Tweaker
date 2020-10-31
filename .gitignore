@@ -2,7 +2,6 @@
 build
 out
 .idea
-eclipse
 run
 runClient
 runServer

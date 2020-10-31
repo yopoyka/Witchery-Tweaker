@@ -1,5 +1,7 @@
 package muwa.witcherytweaker.coremod;
 
+import muwa.witcherytweaker.common.IDistilleryRecipe;
+import muwa.witcherytweaker.common.Inject;
 import net.minecraft.launchwrapper.IClassTransformer;
 import org.apache.logging.log4j.Level;
 import org.objectweb.asm.ClassReader;
@@ -7,7 +9,6 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Map;
@@ -32,6 +33,7 @@ public class ClassTransformer implements IClassTransformer {
 
                     AbstractInsnNode lastDist = null;
                     AbstractInsnNode lastKettle = null;
+                    AbstractInsnNode lastSmelting = null;
 
                     ListIterator<AbstractInsnNode> i = methodNode.instructions.iterator();
                     while (i.hasNext()) {
@@ -45,6 +47,13 @@ public class ClassTransformer implements IClassTransformer {
                             else if (((MethodInsnNode) next).owner.equals("com/emoniph/witchery/crafting/KettleRecipes")
                                     && ((MethodInsnNode) next).name.equals("addRecipe")) {
                                 lastKettle = next;
+                            }
+                        }
+                        else if (lastDist == null && next.getOpcode() == Opcodes.INVOKESTATIC && next instanceof MethodInsnNode) {
+                            if (((MethodInsnNode) next).owner.equals("cpw/mods/fml/common/registry/GameRegistry")
+                                    && ((MethodInsnNode) next).name.equals("addSmelting")
+                            ) {
+                                lastSmelting = next;
                             }
                         }
                     }
@@ -71,6 +80,23 @@ public class ClassTransformer implements IClassTransformer {
                     classNode.methods.add(wtw_kettle);
 
                     log.info("Successfully added wtw_kettle method!");
+
+                    start = lastSmelting.getNext();
+                    finish = lastDist;
+
+                    final InsnList dist = new InsnList();
+                    while (start != finish) {
+                        dist.add(start.clone(map));
+                        start = start.getNext();
+                    }
+                    dist.add(new InsnNode(Opcodes.RETURN));
+
+                    MethodNode wtw_distillery = new MethodNode(Opcodes.ACC_PUBLIC, "wtw_distillery", "()V", null, null);
+                    wtw_distillery.instructions.add(dist);
+
+                    classNode.methods.add(wtw_distillery);
+
+                    log.info("Successfully added wtw_distillery method!");
                 });
             return write(classNode);
         }
@@ -119,6 +145,35 @@ public class ClassTransformer implements IClassTransformer {
 
                     log.info("Successfully added wtw_cauldron method!");
                 });
+
+            return write(classNode);
+        }
+        else if (transformedName.equals("com.emoniph.witchery.crafting.DistilleryRecipes$DistilleryRecipe")) {
+            final ClassNode classNode = read(basicClass);
+
+            Inject.inject(classNode, IDistilleryRecipe.class);
+
+            classNode.methods
+                    .stream()
+                    .filter(m -> m.name.equals("<init>"))
+                    .forEach(methodNode -> {
+                        final InsnList list = new InsnList();
+                        list.add(new VarInsnNode(Opcodes.ALOAD, 0));
+                        list.add(new IntInsnNode(Opcodes.SIPUSH, 800));
+                        list.add(new FieldInsnNode(Opcodes.PUTFIELD, classNode.name, "wtw_cookTime", "I"));
+
+                        AbstractInsnNode last = methodNode.instructions.getLast();
+                        while (last != null) {
+                            if (last.getOpcode() == Opcodes.RETURN)
+                                break;
+
+                            last = last.getPrevious();
+                        }
+
+                        methodNode.instructions.insertBefore(last, list);
+
+                        CorePlugin.log.info("Successfully patched DistilleryRecipe's constructor!");
+                    });
 
             return write(classNode);
         }
