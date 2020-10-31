@@ -30,6 +30,9 @@ String minetweakerVersion = '3.0.11.23'
 
 minecraft {
     version = "1.7.10-10.13.4.1448-1.7.10"
+
+    replace "@VERSION@", project.version
+    replaceIn 'Witweaker.java'
 }
 
 repositories {
@@ -80,28 +83,6 @@ jar {
         attributes 'FMLCorePlugin': 'muwa.witcherytweaker.coremod.CorePlugin'
         attributes 'FMLCorePluginContainsFMLMod': 'true'
     }
-}
-
-def clientCode = {
-    version += '-client'
-    jar {
-        exclude 'muwa/witcherytweaker/server'
-    }
-}
-
-def serverCode = {
-    version += '-server'
-    jar
-}
-
-task buildClient {
-    doFirst clientCode
-    finalizedBy build
-}
-
-task buildServer {
-    doFirst serverCode
-    finalizedBy build
 }
 
 runClient {
