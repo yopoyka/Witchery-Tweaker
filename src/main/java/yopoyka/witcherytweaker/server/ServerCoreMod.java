@@ -1,6 +1,7 @@
 package yopoyka.witcherytweaker.server;
 
 import yopoyka.witcherytweaker.common.Inject;
+import yopoyka.witcherytweaker.coremod.BaseClassTransformer;
 import yopoyka.witcherytweaker.coremod.CorePlugin;
 import net.minecraft.launchwrapper.IClassTransformer;
 import org.objectweb.asm.*;
@@ -14,9 +15,9 @@ import java.util.stream.StreamSupport;
 import static org.objectweb.asm.ClassWriter.COMPUTE_FRAMES;
 import static org.objectweb.asm.ClassWriter.COMPUTE_MAXS;
 
-public class ServerCoreMod {
-    public static IClassTransformer transformer = (name, transformedName, basicClass) -> {
-        if (name.equals("com.emoniph.witchery.blocks.BlockWitchesOven$TileEntityWitchesOven")) {
+public class ServerCoreMod extends BaseClassTransformer {
+    {
+        transformers.put("com.emoniph.witchery.blocks.BlockWitchesOven$TileEntityWitchesOven", (name, transformedName, basicClass) -> {
             ClassNode classNode = read(basicClass);
 
             classNode.methods
@@ -39,8 +40,8 @@ public class ServerCoreMod {
 
             Inject.inject(classNode, IWitchOvenTile.class);
             return write(classNode);
-        }
-        else if (name.equals("com.emoniph.witchery.blocks.BlockWitchesOven$ContainerWitchesOven")) {
+        });
+        transformers.put("com.emoniph.witchery.blocks.BlockWitchesOven$ContainerWitchesOven", (name, transformedName, basicClass) -> {
             ClassNode classNode = read(basicClass);
 
             classNode.visitField(Opcodes.ACC_PUBLIC, "wtw_lastTotalCookTime", "I", null, null)
@@ -52,30 +53,30 @@ public class ServerCoreMod {
                     .findFirst()
                     .ifPresent(methodNode -> {
                         StreamSupport.stream(Spliterators.spliteratorUnknownSize(methodNode.instructions.iterator(), Spliterator.ORDERED), false)
-                            .filter(node -> node.getOpcode() == Opcodes.INVOKEINTERFACE && (((MethodInsnNode) node).name.equals("func_71112_a") || ((MethodInsnNode) node).name.equals("sendProgressBarUpdate")))
-                            .reduce((a, b) -> b) // get last
-                            .ifPresent(node -> {
-                                AbstractInsnNode aqua = node.getNext();
-                                InsnList inst = new InsnList();
-                                inst.add(new VarInsnNode(Opcodes.ALOAD, 0));
-                                inst.add(new FieldInsnNode(Opcodes.GETFIELD, "com/emoniph/witchery/blocks/BlockWitchesOven$ContainerWitchesOven", "wtw_lastTotalCookTime", "I"));
-                                inst.add(new VarInsnNode(Opcodes.ALOAD, 0));
-                                inst.add(new FieldInsnNode(Opcodes.GETFIELD, "com/emoniph/witchery/blocks/BlockWitchesOven$ContainerWitchesOven", "furnace", "Lcom/emoniph/witchery/blocks/BlockWitchesOven$TileEntityWitchesOven;"));
-                                inst.add(new FieldInsnNode(Opcodes.GETFIELD, "com/emoniph/witchery/blocks/BlockWitchesOven$TileEntityWitchesOven", "wtw_cookTime", "I"));
-                                Label end = new Label();
-                                inst.add(new JumpInsnNode(Opcodes.IF_ICMPEQ, new LabelNode(end)));
-                                inst.add(new VarInsnNode(Opcodes.ALOAD, 2));
-                                inst.add(new VarInsnNode(Opcodes.ALOAD, 0));
-                                inst.add(new InsnNode(Opcodes.ICONST_3));
-                                inst.add(new VarInsnNode(Opcodes.ALOAD, 0));
-                                inst.add(new FieldInsnNode(Opcodes.GETFIELD, "com/emoniph/witchery/blocks/BlockWitchesOven$ContainerWitchesOven", "furnace", "Lcom/emoniph/witchery/blocks/BlockWitchesOven$TileEntityWitchesOven;"));
-                                inst.add(new FieldInsnNode(Opcodes.GETFIELD, "com/emoniph/witchery/blocks/BlockWitchesOven$TileEntityWitchesOven", "wtw_cookTime", "I"));
-                                inst.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, ((MethodInsnNode) node).owner, ((MethodInsnNode) node).name, ((MethodInsnNode) node).desc, true));
-                                inst.add(new LabelNode(end));
-                                methodNode.instructions.insert(aqua, inst);
+                                .filter(node -> node.getOpcode() == Opcodes.INVOKEINTERFACE && (((MethodInsnNode) node).name.equals("func_71112_a") || ((MethodInsnNode) node).name.equals("sendProgressBarUpdate")))
+                                .reduce((a, b) -> b) // get last
+                                .ifPresent(node -> {
+                                    AbstractInsnNode aqua = node.getNext();
+                                    InsnList inst = new InsnList();
+                                    inst.add(new VarInsnNode(Opcodes.ALOAD, 0));
+                                    inst.add(new FieldInsnNode(Opcodes.GETFIELD, "com/emoniph/witchery/blocks/BlockWitchesOven$ContainerWitchesOven", "wtw_lastTotalCookTime", "I"));
+                                    inst.add(new VarInsnNode(Opcodes.ALOAD, 0));
+                                    inst.add(new FieldInsnNode(Opcodes.GETFIELD, "com/emoniph/witchery/blocks/BlockWitchesOven$ContainerWitchesOven", "furnace", "Lcom/emoniph/witchery/blocks/BlockWitchesOven$TileEntityWitchesOven;"));
+                                    inst.add(new FieldInsnNode(Opcodes.GETFIELD, "com/emoniph/witchery/blocks/BlockWitchesOven$TileEntityWitchesOven", "wtw_cookTime", "I"));
+                                    Label end = new Label();
+                                    inst.add(new JumpInsnNode(Opcodes.IF_ICMPEQ, new LabelNode(end)));
+                                    inst.add(new VarInsnNode(Opcodes.ALOAD, 2));
+                                    inst.add(new VarInsnNode(Opcodes.ALOAD, 0));
+                                    inst.add(new InsnNode(Opcodes.ICONST_3));
+                                    inst.add(new VarInsnNode(Opcodes.ALOAD, 0));
+                                    inst.add(new FieldInsnNode(Opcodes.GETFIELD, "com/emoniph/witchery/blocks/BlockWitchesOven$ContainerWitchesOven", "furnace", "Lcom/emoniph/witchery/blocks/BlockWitchesOven$TileEntityWitchesOven;"));
+                                    inst.add(new FieldInsnNode(Opcodes.GETFIELD, "com/emoniph/witchery/blocks/BlockWitchesOven$TileEntityWitchesOven", "wtw_cookTime", "I"));
+                                    inst.add(new MethodInsnNode(Opcodes.INVOKEINTERFACE, ((MethodInsnNode) node).owner, ((MethodInsnNode) node).name, ((MethodInsnNode) node).desc, true));
+                                    inst.add(new LabelNode(end));
+                                    methodNode.instructions.insert(aqua, inst);
 
-                                CorePlugin.log.info("Successfully patched tile Witch's Oven Container's cycle");
-                            });
+                                    CorePlugin.log.info("Successfully patched tile Witch's Oven Container's cycle");
+                                });
 
                         InsnList inst = new InsnList();
                         inst.add(new VarInsnNode(Opcodes.ALOAD, 0));
@@ -131,8 +132,8 @@ public class ServerCoreMod {
                     });
 
             return write(classNode);
-        }
-        if (name.equals("com.emoniph.witchery.blocks.BlockDistillery$TileEntityDistillery")) {
+        });
+        transformers.put("com.emoniph.witchery.blocks.BlockDistillery$TileEntityDistillery", (name, transformedName, basicClass) -> {
             ClassNode classNode = read(basicClass);
 
             final MethodNode toRemove = classNode.methods
@@ -166,8 +167,8 @@ public class ServerCoreMod {
             Inject.inject(classNode, IDistilleryTile.class);
 
             return write(classNode);
-        }
-        else if (name.equals("com.emoniph.witchery.blocks.BlockDistillery$ContainerDistillery")) {
+        });
+        transformers.put("com.emoniph.witchery.blocks.BlockDistillery$ContainerDistillery", (name, transformedName, basicClass) -> {
             ClassNode classNode = read(basicClass);
 
             classNode.visitField(Opcodes.ACC_PUBLIC, "wtw_lastTotalCookTime", "I", null, null)
@@ -258,10 +259,8 @@ public class ServerCoreMod {
                     });
 
             return write(classNode);
-        }
-        else
-            return basicClass;
-    };
+        });
+    }
 
     private static ClassNode read(byte[] bytes) {
         ClassReader cr = new ClassReader(bytes);

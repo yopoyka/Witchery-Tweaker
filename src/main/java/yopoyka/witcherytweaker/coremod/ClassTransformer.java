@@ -193,17 +193,17 @@ public class ClassTransformer implements IClassTransformer {
     static {
         try {
             Class<?> clientClass = Class.forName("yopoyka.witcherytweaker.client.ClientCoreMod");
-            client = (IClassTransformer) clientClass.getDeclaredField("transformer").get(null);
+            client = (IClassTransformer) clientClass.newInstance();
             CorePlugin.log.info("Client coremod part loaded");
-        } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
             CorePlugin.log.warn("Client coremod part not found");
             CorePlugin.log.catching(Level.WARN, e);
         }
         try {
             Class<?> serverClass = Class.forName("yopoyka.witcherytweaker.server.ServerCoreMod");
-            server = (IClassTransformer) serverClass.getDeclaredField("transformer").get(null);
+            server = (IClassTransformer) serverClass.newInstance();
             CorePlugin.log.info("Server coremod part loaded");
-        } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
             CorePlugin.log.warn("Server coremod part not found");
             CorePlugin.log.catching(Level.WARN, e);
         }

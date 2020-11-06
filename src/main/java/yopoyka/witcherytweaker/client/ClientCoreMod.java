@@ -1,5 +1,6 @@
 package yopoyka.witcherytweaker.client;
 
+import yopoyka.witcherytweaker.coremod.BaseClassTransformer;
 import yopoyka.witcherytweaker.coremod.CorePlugin;
 import net.minecraft.launchwrapper.IClassTransformer;
 import org.objectweb.asm.*;
@@ -8,14 +9,16 @@ import org.objectweb.asm.tree.*;
 import java.util.ListIterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 import java.util.stream.StreamSupport;
 
 import static org.objectweb.asm.ClassWriter.COMPUTE_FRAMES;
 import static org.objectweb.asm.ClassWriter.COMPUTE_MAXS;
 
-public class ClientCoreMod {
-    public static IClassTransformer transformer = (name, transformedName, basicClass) -> {
-        if (name.equals("com.emoniph.witchery.blocks.BlockWitchesOven$ContainerWitchesOven")) {
+public class ClientCoreMod extends BaseClassTransformer {
+    {
+        transformers.put("com.emoniph.witchery.blocks.BlockWitchesOven$ContainerWitchesOven", (name, transformedName, basicClass) -> {
             ClassNode classNode = read(basicClass);
 
             classNode.visitField(Opcodes.ACC_PUBLIC, "wtw_totalCookTime", "I", null, null)
@@ -58,8 +61,8 @@ public class ClientCoreMod {
                     });
 
             return write(classNode);
-        }
-        else if (name.equals("com.emoniph.witchery.blocks.BlockWitchesOvenGUI")) {
+        });
+        transformers.put("com.emoniph.witchery.blocks.BlockWitchesOvenGUI", (name, transformedName, basicClass) -> {
             ClassNode classNode = read(basicClass);
             boolean srgNames = classNode.methods.stream().anyMatch(m -> m.name.equals("func_146976_a"));
 
@@ -104,8 +107,8 @@ public class ClientCoreMod {
                     });
 
             return write(classNode);
-        }
-        else if (name.equals("com.emoniph.witchery.blocks.BlockDistillery$ContainerDistillery")) {
+        });
+        transformers.put("com.emoniph.witchery.blocks.BlockDistillery$ContainerDistillery", (name, transformedName, basicClass) -> {
             ClassNode classNode = read(basicClass);
 
             classNode.visitField(Opcodes.ACC_PUBLIC, "wtw_totalCookTime", "I", null, null)
@@ -148,8 +151,8 @@ public class ClientCoreMod {
                     });
 
             return write(classNode);
-        }
-        else if (name.equals("com.emoniph.witchery.blocks.BlockDistilleryGUI")) {
+        });
+        transformers.put("com.emoniph.witchery.blocks.BlockDistilleryGUI", (name, transformedName, basicClass) -> {
             ClassNode classNode = read(basicClass);
 
             boolean srgNames = classNode.methods.stream().anyMatch(m -> m.name.equals("func_146976_a"));
@@ -203,51 +206,145 @@ public class ClientCoreMod {
                     .findFirst()
                     .ifPresent(methodNode -> {
                         StreamSupport.stream(Spliterators.spliteratorUnknownSize(methodNode.instructions.iterator(), Spliterator.ORDERED), false)
-                            .filter(node -> node.getOpcode() == Opcodes.INVOKEVIRTUAL && ((MethodInsnNode) node).name.equals("getCookProgressScaled"))
-                            .findFirst()
-                            .ifPresent(node -> {
-                                InsnList inst = new InsnList();
-                                inst.add(new InsnNode(Opcodes.SWAP));
-                                inst.add(new InsnNode(Opcodes.POP));
-                                inst.add(new VarInsnNode(Opcodes.ALOAD, 0));
-                                inst.add(new InsnNode(Opcodes.SWAP));
-                                inst.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "com/emoniph/witchery/blocks/BlockDistilleryGUI", "wtw_getCookProgressScaled", "(I)I", false));
-                                methodNode.instructions.insertBefore(node, inst);
-                                methodNode.instructions.remove(node);
+                                .filter(node -> node.getOpcode() == Opcodes.INVOKEVIRTUAL && ((MethodInsnNode) node).name.equals("getCookProgressScaled"))
+                                .findFirst()
+                                .ifPresent(node -> {
+                                    InsnList inst = new InsnList();
+                                    inst.add(new InsnNode(Opcodes.SWAP));
+                                    inst.add(new InsnNode(Opcodes.POP));
+                                    inst.add(new VarInsnNode(Opcodes.ALOAD, 0));
+                                    inst.add(new InsnNode(Opcodes.SWAP));
+                                    inst.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "com/emoniph/witchery/blocks/BlockDistilleryGUI", "wtw_getCookProgressScaled", "(I)I", false));
+                                    methodNode.instructions.insertBefore(node, inst);
+                                    methodNode.instructions.remove(node);
 
-                                CorePlugin.log.info("Successfully patched Distillery Gui's drawGuiContainerBackgroundLayer method");
-                            });
+                                    CorePlugin.log.info("Successfully patched Distillery Gui's drawGuiContainerBackgroundLayer method");
+                                });
                     });
 
             return write(classNode);
-        }
-        else if (name.equals("com.emoniph.witchery.integration.NEIWitcheryConfig")) {
-            ClassNode classNode = read(basicClass);
+        });
+        transformers.put("com.emoniph.witchery.integration.NEIWitchesOvenRecipeHandler", (name, transformedName, basicClass) -> {
+            final ClassNode classNode = read(basicClass);
 
             classNode.methods
-                .stream()
-                .filter(m -> m.name.equals("loadConfig"))
-                .findFirst()
-                .ifPresent(methodNode -> {
-                    methodNode.instructions.iterator().forEachRemaining(node -> {
-                        if (node.getOpcode() == Opcodes.NEW && node instanceof TypeInsnNode) {
-                            if (((TypeInsnNode) node).desc.equals("com/emoniph/witchery/integration/NEIWitchesOvenRecipeHandler"))
-                                ((TypeInsnNode) node).desc = "yopoyka/witcherytweaker/common/nei/NeiWitchOvenHandler";
-                        }
-                        else if (node.getOpcode() == Opcodes.INVOKESPECIAL && node instanceof MethodInsnNode) {
-                            if (((MethodInsnNode) node).owner.equals("com/emoniph/witchery/integration/NEIWitchesOvenRecipeHandler"))
-                                ((MethodInsnNode) node).owner = "yopoyka/witcherytweaker/common/nei/NeiWitchOvenHandler";
-                        }
+                    .stream()
+                    .filter(forMethod("loadCraftingRecipes").and(forMethodDesc("(Ljava/lang/String;[Ljava/lang/Object;)V")))
+                    .findFirst()
+                    .ifPresent(methodNode -> {
+                        final JumpInsnNode jump = find(methodNode.instructions, opcode(Opcodes.IF_ACMPNE));
+
+                        final InsnList code = new InsnList();
+                        code.add(new FieldInsnNode(
+                                Opcodes.GETSTATIC,
+                                "yopoyka/witcherytweaker/common/nei/NeiWitchOvenHandler",
+                                "instance",
+                                "Lyopoyka/witcherytweaker/common/nei/NeiWitchOvenHandler;"
+                        ));
+                        code.add(new VarInsnNode(Opcodes.ALOAD, 1));
+                        code.add(new VarInsnNode(Opcodes.ALOAD, 2));
+                        code.add(new MethodInsnNode(
+                                Opcodes.INVOKEVIRTUAL,
+                                "yopoyka/witcherytweaker/common/nei/NeiWitchOvenHandler",
+                                "loadCraftingRecipes",
+                                "(Ljava/lang/String;[Ljava/lang/Object;)V",
+                                false
+                        ));
+                        code.add(new FieldInsnNode(
+                                Opcodes.GETSTATIC,
+                                "yopoyka/witcherytweaker/common/WitchOvenRecipes",
+                                "defaultEnabled",
+                                "Z"
+                        ));
+                        final Label target = new Label();
+                        code.add(new JumpInsnNode(Opcodes.IFNE, new LabelNode(target)));
+                        code.add(new InsnNode(Opcodes.RETURN));
+                        code.add(new LabelNode(target));
+
+                        methodNode.instructions.insert(jump, code);
                     });
 
-                    CorePlugin.log.info("Successfully patched NEIWitcheryConfig");
-                });
+            classNode.methods
+                    .stream()
+                    .filter(forMethod("loadCraftingRecipes").and(forMethodDesc("(Lnet/minecraft/item/ItemStack;)V")))
+                    .findFirst()
+                    .ifPresent(methodNode -> {
+                        final InsnList code = new InsnList();
+                        code.add(new FieldInsnNode(
+                                Opcodes.GETSTATIC,
+                                "yopoyka/witcherytweaker/common/nei/NeiWitchOvenHandler",
+                                "instance",
+                                "Lyopoyka/witcherytweaker/common/nei/NeiWitchOvenHandler;"
+                        ));
+                        code.add(new VarInsnNode(Opcodes.ALOAD, 1));
+                        code.add(new MethodInsnNode(
+                                Opcodes.INVOKEVIRTUAL,
+                                "yopoyka/witcherytweaker/common/nei/NeiWitchOvenHandler",
+                                "loadCraftingRecipes",
+                                "(Lnet/minecraft/item/ItemStack;)V",
+                                false
+                        ));
+                        code.add(new MethodInsnNode(
+                                Opcodes.INVOKEVIRTUAL,
+                                "yopoyka/witcherytweaker/common/nei/NeiWitchOvenHandler",
+                                "loadCraftingRecipes",
+                                "(Ljava/lang/String;[Ljava/lang/Object;)V",
+                                false
+                        ));
+                        code.add(new FieldInsnNode(
+                                Opcodes.GETSTATIC,
+                                "yopoyka/witcherytweaker/common/WitchOvenRecipes",
+                                "defaultEnabled",
+                                "Z"
+                        ));
+                        final Label target = new Label();
+                        code.add(new JumpInsnNode(Opcodes.IFNE, new LabelNode(target)));
+                        code.add(new InsnNode(Opcodes.RETURN));
+                        code.add(new LabelNode(target));
+                    });
+
+            classNode.methods
+                    .stream()
+                    .filter(forMethod("loadUsageRecipes").and(forMethodDesc("(Lnet/minecraft/item/ItemStack;)V")))
+                    .findFirst()
+                    .ifPresent(methodNode -> {
+                        final InsnList code = new InsnList();
+                        code.add(new FieldInsnNode(
+                                Opcodes.GETSTATIC,
+                                "yopoyka/witcherytweaker/common/nei/NeiWitchOvenHandler",
+                                "instance",
+                                "Lyopoyka/witcherytweaker/common/nei/NeiWitchOvenHandler;"
+                        ));
+                        code.add(new VarInsnNode(Opcodes.ALOAD, 1));
+                        code.add(new MethodInsnNode(
+                                Opcodes.INVOKEVIRTUAL,
+                                "yopoyka/witcherytweaker/common/nei/NeiWitchOvenHandler",
+                                "loadUsageRecipes",
+                                "(Lnet/minecraft/item/ItemStack;)V",
+                                false
+                        ));
+                        code.add(new MethodInsnNode(
+                                Opcodes.INVOKEVIRTUAL,
+                                "yopoyka/witcherytweaker/common/nei/NeiWitchOvenHandler",
+                                "loadCraftingRecipes",
+                                "(Ljava/lang/String;[Ljava/lang/Object;)V",
+                                false
+                        ));
+                        code.add(new FieldInsnNode(
+                                Opcodes.GETSTATIC,
+                                "yopoyka/witcherytweaker/common/WitchOvenRecipes",
+                                "defaultEnabled",
+                                "Z"
+                        ));
+                        final Label target = new Label();
+                        code.add(new JumpInsnNode(Opcodes.IFNE, new LabelNode(target)));
+                        code.add(new InsnNode(Opcodes.RETURN));
+                        code.add(new LabelNode(target));
+                    });
 
             return write(classNode);
-        }
-        else
-            return basicClass;
-    };
+        });
+    }
 
     private static ClassNode read(byte[] bytes) {
         ClassReader cr = new ClassReader(bytes);
@@ -260,5 +357,78 @@ public class ClientCoreMod {
         ClassWriter cw = new ClassWriter(COMPUTE_FRAMES | COMPUTE_MAXS);
         classNode.accept(cw);
         return cw.toByteArray();
+    }
+
+    public static <T extends AbstractInsnNode> T find(InsnList list, Predicate<AbstractInsnNode> filter) {
+        AbstractInsnNode node = list.getFirst();
+        while (node != null) {
+            if (filter.test(node))
+                return (T) node;
+            node = node.getNext();
+        }
+        return null;
+    }
+
+    public static <T extends AbstractInsnNode> T find(AbstractInsnNode node, Predicate<AbstractInsnNode> filter) {
+        while (node != null) {
+            if (filter.test(node))
+                return (T) node;
+            node = node.getNext();
+        }
+        return null;
+    }
+
+    public static <T extends AbstractInsnNode> T findBack(AbstractInsnNode node, Predicate<AbstractInsnNode> filter) {
+        while (node != null) {
+            if (filter.test(node))
+                return (T) node;
+            node = node.getPrevious();
+        }
+        return null;
+    }
+
+    public static <T extends AbstractInsnNode> void forEach(InsnList list, Predicate<AbstractInsnNode> filter, BiConsumer<InsnList, T> action) {
+        AbstractInsnNode node = list.getFirst();
+        while (node != null) {
+            if (filter.test(node))
+                action.accept(list, (T) node);
+            node = node.getNext();
+        }
+    }
+
+    public static Predicate<AbstractInsnNode> opcode(int opcode) {
+        return n -> n.getOpcode() == opcode;
+    }
+
+    public static Predicate<AbstractInsnNode> type(String type) {
+        return n -> n instanceof TypeInsnNode && type.equals(((TypeInsnNode) n).desc);
+    }
+
+    public static Predicate<MethodNode> forMethod(String name) {
+        return m -> name.equals(m.name);
+    }
+
+    public static Predicate<MethodNode> forMethodDesc(String desc) {
+        return m -> desc.equals(m.desc);
+    }
+
+    public static Predicate<AbstractInsnNode> method(String name) {
+        return m -> m instanceof MethodInsnNode && name.equals(((MethodInsnNode) m).name);
+    }
+
+    public static Predicate<AbstractInsnNode> methodDesc(String desc) {
+        return m -> m instanceof MethodInsnNode && desc.equals(((MethodInsnNode) m).desc);
+    }
+
+    public static Predicate<AbstractInsnNode> methodOwner(String owner) {
+        return m -> m instanceof MethodInsnNode && owner.equals(((MethodInsnNode) m).owner);
+    }
+
+    public static Predicate<AbstractInsnNode> label(Label label) {
+        return m -> m instanceof LabelNode && label.equals(((LabelNode) m).getLabel());
+    }
+
+    public static Predicate<AbstractInsnNode> jump(Label label) {
+        return m -> m instanceof JumpInsnNode && label.equals(((JumpInsnNode) m).label.getLabel());
     }
 }

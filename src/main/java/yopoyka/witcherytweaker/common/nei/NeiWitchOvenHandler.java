@@ -16,6 +16,7 @@ import java.util.List;
 import static codechicken.nei.NEIServerUtils.areStacksSameType;
 
 public class NeiWitchOvenHandler extends NEIWitchesOvenRecipeHandler {
+    public static final NeiWitchOvenHandler instance = new NeiWitchOvenHandler();
     private static Field ingredField;
 
     static {
@@ -43,7 +44,7 @@ public class NeiWitchOvenHandler extends NEIWitchesOvenRecipeHandler {
 
     @Override
     public void loadCraftingRecipes(String outputId, Object... results) {
-        if (outputId.equals("witchery_cooking") && getClass() == NeiWitchOvenHandler.class) {
+//        if (outputId.equals("witchery_cooking") && getClass() == NeiWitchOvenHandler.class) {
             WitchOvenRecipes.recipes.forEach(impl -> {
                 arecipes.add(new Recipe(
                         impl.input.copy(),
@@ -52,19 +53,19 @@ public class NeiWitchOvenHandler extends NEIWitchesOvenRecipeHandler {
                         impl.jarsRequired
                 ));
             });
-        }
-        else {
-            super.loadCraftingRecipes(outputId, results);
-        }
+//        }
+//        else {
+//            super.loadCraftingRecipes(outputId, results);
+//        }
     }
 
     @Override
     public void loadUsageRecipes(String inputId, Object... ingredients) {
-        if (inputId.equals("fuel") && getClass() == NeiWitchOvenHandler.class) {
+//        if (inputId.equals("fuel") && getClass() == NeiWitchOvenHandler.class) {
             loadCraftingRecipes("witchery_cooking");
-        } else {
-            super.loadUsageRecipes(inputId, ingredients);
-        }
+//        } else {
+//            super.loadUsageRecipes(inputId, ingredients);
+//        }
     }
 
     @Override
