@@ -1,3 +1,5 @@
+import java.nio.file.Files
+
 buildscript {
     repositories {
         mavenCentral()
@@ -28,6 +30,21 @@ sourceCompatibility = targetCompatibility = 1.8
 
 String minetweakerVersion = '3.0.11.23'
 
+void download(String url, String file) {
+    def path = project.file(file)
+    if (!path.exists()) {
+        println 'downloading ' + file
+        Files.createDirectories(path.toPath().getParent())
+        def c = new URL(url).openConnection()
+        Files.copy(c.inputStream, path.toPath())
+    }
+}
+
+def witchery = 'witchery-1.7.10-0.24.1'
+def mineTweaker = 'MineTweaker3-1.7.10-3.0.10B'
+download('https://edge.forgecdn.net/files/2234/410/' + witchery + '.jar', 'lib/' + witchery + '.jar')
+download('https://edge.forgecdn.net/files/2259/434/' + mineTweaker + '.jar', 'lib/' + mineTweaker + '.jar')
+
 minecraft {
     version = "1.7.10-10.13.4.1448-1.7.10"
 
@@ -54,8 +71,8 @@ repositories {
 
 dependencies {
     compileOnly 'MineTweaker3:MineTweaker3-API:' + minetweakerVersion
-    compile muwafgdep.deobf('curse.maven:witchery-1.7.10-0.24.1:2234410')
-    runtime muwafgdep.deobf('curse.maven:MineTweaker3-1.7.10-3.0.10B:2259434')
+    compile muwafgdep.deobf(name: witchery)
+    runtime muwafgdep.deobf(name: mineTweaker)
     compile "codechicken:CodeChickenLib:1.7.10-1.1.3.140:dev"
     compileOnly "codechicken:CodeChickenLib:1.7.10-1.1.3.140:src"
     compile "codechicken:CodeChickenCore:1.7.10-1.0.7.47:dev"
