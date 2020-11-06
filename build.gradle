@@ -9,27 +9,20 @@ buildscript {
             name = "sonatype"
             url = "https://oss.sonatype.org/content/repositories/snapshots/"
         }
-        repositories {
-            maven {
-                url "https://plugins.gradle.org/m2/"
-            }
-        }
         mavenLocal()
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
         // classpath 'muwa.forgegradle:muwafg:1.0'
         classpath files('C:\\Users\\muwa\\work\\Muwa-Legacy-ForgeGradle-Extension\\build\\libs\\muwafg-1.0.jar')
-        classpath "com.wynprice.cursemaven:CurseMaven:1.+"
     }
 }
 
 apply plugin: 'forge'
 apply plugin: 'muwafg'
-apply plugin: "com.wynprice.cursemaven"
 
 version = "1.0"
-group= "muwa"
+group= "yopoyka"
 archivesBaseName = "witcherytweaker"
 sourceCompatibility = targetCompatibility = 1.8
 
@@ -53,6 +46,9 @@ repositories {
     maven {
         name 'chickenBones'
         url 'https://chickenbones.net/maven'
+    }
+    maven {
+        url = "https://www.cursemaven.com"
     }
 }
 
