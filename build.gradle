@@ -1,5 +1,3 @@
-import java.nio.file.Files
-
 buildscript {
     repositories {
         mavenCentral()
@@ -12,11 +10,14 @@ buildscript {
             url = "https://oss.sonatype.org/content/repositories/snapshots/"
         }
         mavenLocal()
+        maven {
+            name = 'yopoyka'
+            url = 'https://github.com/yopoyka/maven/raw/maven'
+        }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
-        // classpath 'muwa.forgegradle:muwafg:1.0'
-        classpath files('C:\\Users\\muwa\\work\\Muwa-Legacy-ForgeGradle-Extension\\build\\libs\\muwafg-1.0.jar')
+        classpath 'muwa.forgegradle:muwafg:1.+'
     }
 }
 
@@ -30,13 +31,14 @@ sourceCompatibility = targetCompatibility = 1.8
 
 String minetweakerVersion = '3.0.11.23'
 
+/* if curse maven doesn't work
 void download(String url, String file) {
     def path = project.file(file)
     if (!path.exists()) {
         println 'downloading ' + file
-        Files.createDirectories(path.toPath().getParent())
+        path.mkdirs();
         def c = new URL(url).openConnection()
-        Files.copy(c.inputStream, path.toPath())
+        java.nio.file.Files.copy(c.inputStream, path.toPath())
     }
 }
 
@@ -44,6 +46,7 @@ def witchery = 'witchery-1.7.10-0.24.1'
 def mineTweaker = 'MineTweaker3-1.7.10-3.0.10B'
 download('https://edge.forgecdn.net/files/2234/410/' + witchery + '.jar', 'lib/' + witchery + '.jar')
 download('https://edge.forgecdn.net/files/2259/434/' + mineTweaker + '.jar', 'lib/' + mineTweaker + '.jar')
+ */
 
 minecraft {
     version = "1.7.10-10.13.4.1448-1.7.10"
@@ -65,14 +68,22 @@ repositories {
         url 'https://chickenbones.net/maven'
     }
     maven {
+        url = "file:///C:/Users/muwa/.gradle/caches/muwa_forge_gradle/repo"
+    }
+    maven {
+        name = 'curseMaven'
         url = "https://www.cursemaven.com"
     }
 }
 
 dependencies {
     compileOnly 'MineTweaker3:MineTweaker3-API:' + minetweakerVersion
+    /* if curse maven doesn't work
     compile muwafgdep.deobf(name: witchery)
     runtime muwafgdep.deobf(name: mineTweaker)
+     */
+    compile muwafgdep.deobf('curse.maven:witchery-1.7.10-0.24.1:2234410')
+    runtime muwafgdep.deobf('curse.maven:MineTweaker3-1.7.10-3.0.10B:2259434')
     compile "codechicken:CodeChickenLib:1.7.10-1.1.3.140:dev"
     compileOnly "codechicken:CodeChickenLib:1.7.10-1.1.3.140:src"
     compile "codechicken:CodeChickenCore:1.7.10-1.0.7.47:dev"
