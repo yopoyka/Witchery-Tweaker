@@ -1,6 +1,5 @@
-package yopoyka.witcherytweaker.server;
+package yopoyka.witcherytweaker.common;
 
-import yopoyka.witcherytweaker.common.Inject;
 import net.minecraft.item.ItemStack;
 
 public interface IWitchOvenTile {

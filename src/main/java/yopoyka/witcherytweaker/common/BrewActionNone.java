@@ -1,4 +1,4 @@
-package yopoyka.witcherytweaker.server;
+package yopoyka.witcherytweaker.common;
 
 import com.emoniph.witchery.brewing.*;
 import com.emoniph.witchery.brewing.action.BrewAction;

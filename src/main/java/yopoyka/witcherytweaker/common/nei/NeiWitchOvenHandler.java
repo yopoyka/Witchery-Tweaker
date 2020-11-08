@@ -3,10 +3,10 @@ package yopoyka.witcherytweaker.common.nei;
 import codechicken.nei.PositionedStack;
 import com.emoniph.witchery.Witchery;
 import com.emoniph.witchery.integration.NEIWitchesOvenRecipeHandler;
-import yopoyka.witcherytweaker.Witweaker;
-import yopoyka.witcherytweaker.common.WitchOvenRecipes;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import yopoyka.witcherytweaker.Witweaker;
+import yopoyka.witcherytweaker.common.WitchOvenRecipesSupport;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
@@ -30,7 +30,7 @@ public class NeiWitchOvenHandler extends NEIWitchesOvenRecipeHandler {
 
     @Override
     public void loadCraftingRecipes(ItemStack result) {
-        WitchOvenRecipes.recipes
+        WitchOvenRecipesSupport.recipes
                 .stream()
                 .filter(impl -> areStacksSameType(impl.output, result) || areStacksSameType(impl.byProduct, result))
                 .map(impl -> new Recipe(
@@ -45,7 +45,7 @@ public class NeiWitchOvenHandler extends NEIWitchesOvenRecipeHandler {
     @Override
     public void loadCraftingRecipes(String outputId, Object... results) {
 //        if (outputId.equals("witchery_cooking") && getClass() == NeiWitchOvenHandler.class) {
-            WitchOvenRecipes.recipes.forEach(impl -> {
+            WitchOvenRecipesSupport.recipes.forEach(impl -> {
                 arecipes.add(new Recipe(
                         impl.input.copy(),
                         impl.output.copy(),
@@ -71,7 +71,7 @@ public class NeiWitchOvenHandler extends NEIWitchesOvenRecipeHandler {
     @Override
     public void loadUsageRecipes(ItemStack ingred) {
         boolean jar = Witchery.Items.GENERIC.itemEmptyClayJar.isMatch(ingred);
-        WitchOvenRecipes.recipes
+        WitchOvenRecipesSupport.recipes
                 .stream()
                 .filter(impl -> areStacksSameType(impl.input, ingred) || (jar && impl.jarsRequired > 0))
                 .map(impl -> new Recipe(

@@ -1,8 +1,11 @@
 package yopoyka.witcherytweaker.server;
 
 import com.emoniph.witchery.blocks.BlockWitchesOven;
-import yopoyka.witcherytweaker.common.WitchOvenRecipes;
 import net.minecraft.tileentity.TileEntityFurnace;
+import yopoyka.witcherytweaker.common.IOvenRecipe;
+import yopoyka.witcherytweaker.common.IWitchOvenTile;
+import yopoyka.witcherytweaker.common.OvenRecipe;
+import yopoyka.witcherytweaker.common.WitchOvenRecipesSupport;
 
 public class WitchOvenHook {
     public static void updateOven(BlockWitchesOven.TileEntityWitchesOven oven) {
@@ -62,9 +65,9 @@ public class WitchOvenHook {
     }
 
     public static IOvenRecipe getMatch(BlockWitchesOven.TileEntityWitchesOven oven) {
-        for (WitchOvenRecipes.Impl value : WitchOvenRecipes.recipes) {
-            if (((IOvenRecipe) value).canSmelt(oven))
-                return (IOvenRecipe) value;
+        for (OvenRecipe value : WitchOvenRecipesSupport.recipes) {
+            if (value.canSmelt(oven))
+                return value;
         }
         if (IOvenRecipe.DEFAULT.canSmelt(oven))
             return IOvenRecipe.DEFAULT;

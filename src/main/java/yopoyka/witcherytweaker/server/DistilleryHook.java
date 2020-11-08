@@ -3,8 +3,9 @@ package yopoyka.witcherytweaker.server;
 import com.emoniph.witchery.blocks.BlockDistillery;
 import com.emoniph.witchery.common.IPowerSource;
 import com.emoniph.witchery.crafting.DistilleryRecipes;
-import yopoyka.witcherytweaker.common.IDistilleryRecipe;
 import net.minecraft.item.ItemStack;
+import yopoyka.witcherytweaker.common.IDistilleryRecipe;
+import yopoyka.witcherytweaker.common.IDistilleryTile;
 import yopoyka.witcherytweaker.common.util.Util;
 
 public class DistilleryHook {

@@ -1,19 +1,22 @@
 package yopoyka.witcherytweaker.server;
 
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.*;
+import yopoyka.witcherytweaker.common.IDistilleryTile;
+import yopoyka.witcherytweaker.common.IWitchOvenTile;
 import yopoyka.witcherytweaker.common.Inject;
 import yopoyka.witcherytweaker.coremod.BaseClassTransformer;
 import yopoyka.witcherytweaker.coremod.CorePlugin;
-import net.minecraft.launchwrapper.IClassTransformer;
-import org.objectweb.asm.*;
-import org.objectweb.asm.tree.*;
 
 import java.util.ListIterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.StreamSupport;
 
-import static org.objectweb.asm.ClassWriter.COMPUTE_FRAMES;
-import static org.objectweb.asm.ClassWriter.COMPUTE_MAXS;
+import static yopoyka.witcherytweaker.coremod.Asm.read;
+import static yopoyka.witcherytweaker.coremod.Asm.write;
 
 public class ServerCoreMod extends BaseClassTransformer {
     {
@@ -260,18 +263,5 @@ public class ServerCoreMod extends BaseClassTransformer {
 
             return write(classNode);
         });
-    }
-
-    private static ClassNode read(byte[] bytes) {
-        ClassReader cr = new ClassReader(bytes);
-        ClassNode classNode = new ClassNode();
-        cr.accept(classNode, 0);
-        return classNode;
-    }
-
-    private static byte[] write(ClassNode classNode) {
-        ClassWriter cw = new ClassWriter(COMPUTE_FRAMES | COMPUTE_MAXS);
-        classNode.accept(cw);
-        return cw.toByteArray();
     }
 }

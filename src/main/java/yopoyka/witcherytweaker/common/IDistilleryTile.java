@@ -1,8 +1,7 @@
-package yopoyka.witcherytweaker.server;
+package yopoyka.witcherytweaker.common;
 
 import com.emoniph.witchery.common.IPowerSource;
 import com.emoniph.witchery.util.Coord;
-import yopoyka.witcherytweaker.common.Inject;
 
 public interface IDistilleryTile {
     @Inject.Access(value = "wtw_cookTime", create = true)
